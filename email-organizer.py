@@ -20,13 +20,16 @@ def get_bedrock_client():
         config=config
     )
 
-def summarize_emails(email_content):
+def summarize_emails(email_contents):
     client = get_bedrock_client()
-    model_id = 'anthropic.claude-v2'  # Make sure this is the correct model ID
+    model_id = 'anthropic.claude-v2'  # Adjust if you have a specific model version
 
-    # Construct the prompt according to Bedrock's required format
+    # Format the email contents into a single string with clear delineation
+    formatted_emails = "\n\n".join([f"Email {idx + 1}:\n{content}" for idx, content in enumerate(email_contents)])
+    
+    # Construct the prompt with detailed instructions for the desired output format
     summary_prompt = f"""
-Human: Given the following emails, generate a delightful inbox overview that users will see when they open their email app that includes:
+Human: Given the following emails, generate an inbox overview that includes:
 1. Total number of emails received today and a breakdown of:
    - Important & urgent emails that need immediate attention.
    - Emails awaiting replies.
@@ -39,16 +42,16 @@ Human: Given the following emails, generate a delightful inbox overview that use
    - Informational emails to store for future reference.
 3. Trends analysis including the most active conversation, email volume comparison with last week, and most frequently discussed topics.
 4. Weekly reminders for managing the inbox efficiently.
-5. Add Emojis and make it personalble and human-like.
+
 Email content:
-{email_content}
+{formatted_emails}
 
 Assistant:
 """
 
     logging.info("Sending prompt to model: %s", summary_prompt)
 
-    # Prepare the request to AWS Bedrock
+    # Configure the request to AWS Bedrock
     request_body = json.dumps({
         "prompt": summary_prompt,
         "max_tokens_to_sample": 1000,
@@ -67,7 +70,7 @@ Assistant:
             contentType='application/json'
         )
 
-        # Check if 'body' is in the response and read it
+        # Decode the response
         if 'body' in response:
             raw_response_content = response['body'].read().decode('utf-8')
             logging.info("Raw response content: %s", raw_response_content)
@@ -86,15 +89,16 @@ Assistant:
 
 st.title("Email Organizer Assistant")
 
-# Pre-filled text box with all sample emails
-sample_emails = """Your detailed email content here..."""  # Update your sample emails here
-
-email_content = st.text_area("Paste or Edit Emails Here:", value=sample_emails, height=300)
+# Create three text areas for inputting emails with placeholder text for a demo
+email_contents = []
+for i in range(1, 4):  # Creating three input boxes
+    email = st.text_area(f"Email {i}", value=f"Placeholder for email {i}. Please replace with your own email content.", height=150)
+    email_contents.append(email)
 
 if st.button("Generate Inbox Summary"):
-    if email_content:
-        summary = summarize_emails(email_content)
+    if all(email_contents):
+        summary = summarize_emails(email_contents)
         st.success("Inbox Summary generated!")
         st.write("Inbox Summary:", summary)
     else:
-        st.error("Please ensure the email content box is not empty before generating the summary.")
+        st.error("Please ensure all email boxes are filled before generating the summary.")
