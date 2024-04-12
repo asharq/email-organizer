@@ -44,7 +44,7 @@ Human: Given the following emails, generate a delightful inbox overview that use
 4. Weekly reminders for managing the inbox efficiently.
 5. Add Emojis and make it personalble and human-like.
 Email content:
-{email_content}
+{formatted_emails}
 
 Assistant:
 """
