@@ -29,7 +29,7 @@ def summarize_emails(email_contents):
     
     # Construct the prompt with detailed instructions for the desired output format
     summary_prompt = f"""
-Human: Given the following emails, generate an inbox overview that includes:
+Human: Given the following emails, generate a delightful inbox overview that users will see when they open their email app that includes:
 1. Total number of emails received today and a breakdown of:
    - Important & urgent emails that need immediate attention.
    - Emails awaiting replies.
@@ -42,9 +42,9 @@ Human: Given the following emails, generate an inbox overview that includes:
    - Informational emails to store for future reference.
 3. Trends analysis including the most active conversation, email volume comparison with last week, and most frequently discussed topics.
 4. Weekly reminders for managing the inbox efficiently.
-
+5. Add Emojis and make it personalble and human-like.
 Email content:
-{formatted_emails}
+{email_content}
 
 Assistant:
 """
